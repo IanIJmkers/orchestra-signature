@@ -227,6 +227,55 @@
     color: var(--ink);
     font-weight: 600;
   }
+
+  .form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 18px;
+    margin: 0 0 36px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .field .req {
+    color: var(--gold);
+  }
+  .field .opt {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .field input {
+    font: inherit;
+    font-size: 15px;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--shell);
+    color: var(--ink);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field input::placeholder {
+    color: color-mix(in srgb, var(--muted) 65%, transparent);
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 20%, transparent);
+  }
+  @media (max-width: 520px) {
+    .form {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 </head>
 <body>
@@ -235,25 +284,65 @@
   <p class="eyebrow">Orchestra</p>
   <h1>Je e-mailhandtekening instellen</h1>
   <p class="lede">
-    Kopieer de handtekening hieronder, plak hem in Outlook en vervang naam,
-    functie en telefoonnummer door je eigen gegevens.
+    Vul je gegevens in, controleer het voorbeeld en kopieer je persoonlijke
+    handtekening naar Outlook.
   </p>
 
   <ol class="steps">
+    <li>Vul hieronder je gegevens in — het voorbeeld werkt direct bij.</li>
     <li>
       Klik op <strong>&nbsp;Handtekening kopiëren&nbsp;</strong> hieronder.
     </li>
     <li>
       In Outlook:
-      <strong>&nbsp;Bestand → Opties → E-mail → Handtekeningen</strong>
-      &nbsp;(of Instellingen → Handtekeningen).
-    </li>
-    <li>
-      Maak een nieuwe handtekening, plak (<strong
-        >&nbsp;Ctrl/Cmd + V&nbsp;</strong
-      >) en pas je naam, functie en telefoon aan.
+      <strong>&nbsp;Bestand → Opties → E-mail → Handtekeningen</strong>, maak
+      een nieuwe handtekening en plak (<strong>&nbsp;Ctrl/Cmd + V&nbsp;</strong>).
     </li>
   </ol>
+
+  <p class="card-label">Jouw gegevens</p>
+  <div class="form">
+    <div class="field">
+      <label for="in-voornaam">Voornaam <span class="req">*</span></label>
+      <input
+        id="in-voornaam"
+        type="text"
+        placeholder="Voornaam"
+        autocomplete="given-name"
+      />
+    </div>
+    <div class="field">
+      <label for="in-achternaam">Achternaam <span class="req">*</span></label>
+      <input
+        id="in-achternaam"
+        type="text"
+        placeholder="Achternaam"
+        autocomplete="family-name"
+      />
+    </div>
+    <div class="field">
+      <label for="in-functie"
+        >Functie <span class="opt">(optioneel)</span></label
+      >
+      <input
+        id="in-functie"
+        type="text"
+        placeholder="Bijv. Adviseur"
+        autocomplete="organization-title"
+      />
+    </div>
+    <div class="field">
+      <label for="in-telefoon"
+        >Telefoon <span class="opt">(optioneel)</span></label
+      >
+      <input
+        id="in-telefoon"
+        type="tel"
+        placeholder="+31 (0)70 000 00 00"
+        autocomplete="tel"
+      />
+    </div>
+  </div>
 
   <p class="card-label">Voorbeeld</p>
   <div class="preview">
@@ -332,6 +421,7 @@
                   >
                     <tr>
                       <td
+                        id="sig-name"
                         style="
                           padding: 0 0 3px 0;
                           font-family:
@@ -347,8 +437,9 @@
                         Voornaam Achternaam
                       </td>
                     </tr>
-                    <tr>
+                    <tr id="sig-fn-tr">
                       <td
+                        id="sig-fn-cell"
                         style="
                           padding: 0 0 5px 0;
                           font-family:
@@ -435,6 +526,74 @@
     var hint = document.getElementById("hint");
     var sig = document.getElementById("signature");
     var defaultLabel = btn.textContent;
+    var defaultHint = hint.textContent;
+
+    var inVoornaam = document.getElementById("in-voornaam");
+    var inAchternaam = document.getElementById("in-achternaam");
+    var inFunctie = document.getElementById("in-functie");
+    var inTelefoon = document.getElementById("in-telefoon");
+
+    var nameCell = document.getElementById("sig-name");
+    var fnRow = document.getElementById("sig-fn-tr");
+    var fnCell = document.getElementById("sig-fn-cell");
+
+    function esc(s) {
+      return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function telHref(raw) {
+      var plus = raw.trim().charAt(0) === "+";
+      var digits = raw.replace(/[^0-9]/g, "");
+      return "tel:" + (plus ? "+" : "") + digits;
+    }
+
+    function render() {
+      var voornaam = inVoornaam.value.trim();
+      var achternaam = inAchternaam.value.trim();
+      var functie = inFunctie.value.trim();
+      var telefoon = inTelefoon.value.trim();
+
+      var fullName = (voornaam + " " + achternaam).trim();
+      nameCell.textContent = fullName || "Voornaam Achternaam";
+
+      var fnHtml = functie ? esc(functie) : "";
+      var telHtml = telefoon
+        ? 'T <a href="' +
+          telHref(telefoon) +
+          '" style="color:#b8965a; text-decoration:none;">' +
+          esc(telefoon) +
+          "</a>"
+        : "";
+      var sep = "&nbsp;&nbsp;&middot;&nbsp;&nbsp;";
+
+      if (fnHtml && telHtml) {
+        fnCell.innerHTML = fnHtml + sep + telHtml;
+      } else {
+        fnCell.innerHTML = fnHtml || telHtml;
+      }
+
+      // Hide (and drop from the copy) the whole line when both are empty.
+      if (fnHtml || telHtml) {
+        fnRow.style.display = "";
+        fnRow.removeAttribute("data-empty");
+      } else {
+        fnRow.style.display = "none";
+        fnRow.setAttribute("data-empty", "true");
+      }
+    }
+
+    function cleanSignature() {
+      var clone = sig.cloneNode(true);
+      var drop = clone.querySelectorAll('[data-empty="true"]');
+      for (var i = 0; i < drop.length; i++) {
+        drop[i].parentNode.removeChild(drop[i]);
+      }
+      return clone;
+    }
 
     function selectSignature() {
       var range = document.createRange();
@@ -442,7 +601,6 @@
       var sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      return range;
     }
 
     function done() {
@@ -452,12 +610,21 @@
       setTimeout(function () {
         btn.textContent = defaultLabel;
         btn.classList.remove("done");
+        hint.textContent = defaultHint;
       }, 2600);
     }
 
     async function copy() {
-      var html = sig.innerHTML;
-      var text = sig.innerText;
+      if (!inVoornaam.value.trim() || !inAchternaam.value.trim()) {
+        hint.textContent = "Vul eerst je voor- en achternaam in.";
+        (inVoornaam.value.trim() ? inAchternaam : inVoornaam).focus();
+        return;
+      }
+
+      var clone = cleanSignature();
+      var html = clone.innerHTML;
+      var text = clone.textContent.replace(/\s+/g, " ").trim();
+
       // Preferred: rich clipboard write
       if (
         window.ClipboardItem &&
@@ -477,7 +644,7 @@
           /* fall through */
         }
       }
-      // Fallback: select + execCommand (carries formatting)
+      // Fallback: select + execCommand (carries formatting; skips hidden rows)
       try {
         selectSignature();
         if (document.execCommand("copy")) {
@@ -493,7 +660,11 @@
         "Selectie staat klaar — druk op Ctrl/Cmd + C om te kopiëren.";
     }
 
+    [inVoornaam, inAchternaam, inFunctie, inTelefoon].forEach(function (el) {
+      el.addEventListener("input", render);
+    });
     btn.addEventListener("click", copy);
+    render();
   })();
 </script>
 </body>
