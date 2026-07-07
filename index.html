@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orchestra e-mailhandtekening</title>
+<style>
+  :root {
+    --navy: #0b2a48;
+    --navy-soft: #163a5f;
+    --gold: #b8965a;
+    --ink: #1a2230;
+    --muted: #5b6472;
+    --paper: #f7f5f1;
+    --card: #ffffff;
+    --line: #e4e0d8;
+    --shell: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #eef1f5;
+      --muted: #9aa6b4;
+      --paper: #0d1622;
+      --line: #22303f;
+      --shell: #101b28;
+      --navy: #cbe0f5;
+      --navy-soft: #a9c6e6;
+    }
+  }
+  :root[data-theme="light"] {
+    --navy: #0b2a48;
+    --navy-soft: #163a5f;
+    --ink: #1a2230;
+    --muted: #5b6472;
+    --paper: #f7f5f1;
+    --line: #e4e0d8;
+    --shell: #ffffff;
+  }
+  :root[data-theme="dark"] {
+    --navy: #cbe0f5;
+    --navy-soft: #a9c6e6;
+    --ink: #eef1f5;
+    --muted: #9aa6b4;
+    --paper: #0d1622;
+    --line: #22303f;
+    --shell: #101b28;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+      sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(28px, 6vw, 64px) 24px 72px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+  h1 {
+    font-size: clamp(26px, 5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    text-wrap: balance;
+    margin: 0 0 14px;
+    color: var(--navy);
+  }
+  .lede {
+    font-size: 16px;
+    color: var(--muted);
+    margin: 0 0 40px;
+    max-width: 52ch;
+  }
+
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 0 0 36px;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 46px;
+    font-size: 15px;
+    color: var(--ink);
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--shell);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+  }
+  :root[data-theme="dark"] .steps li::before,
+  .steps li::before {
+  }
+  @media (prefers-color-scheme: dark) {
+    .steps li::before {
+      color: #0d1622;
+    }
+  }
+  :root[data-theme="dark"] .steps li::before {
+    color: #0d1622;
+  }
+  :root[data-theme="light"] .steps li::before {
+    color: #ffffff;
+  }
+
+  .card-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .preview {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px 26px;
+    overflow-x: auto;
+    box-shadow:
+      0 1px 2px rgba(11, 42, 72, 0.04),
+      0 12px 32px rgba(11, 42, 72, 0.06);
+  }
+
+  .actions {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .copy-btn {
+    appearance: none;
+    border: 0;
+    background: var(--navy);
+    color: var(--shell);
+    font: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 13px 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+      transform 0.12s ease,
+      background 0.2s ease,
+      opacity 0.2s ease;
+  }
+  @media (prefers-color-scheme: dark) {
+    .copy-btn {
+      color: #0d1622;
+    }
+  }
+  :root[data-theme="dark"] .copy-btn {
+    color: #0d1622;
+  }
+  :root[data-theme="light"] .copy-btn {
+    color: #ffffff;
+  }
+  .copy-btn:hover {
+    background: var(--navy-soft);
+  }
+  .copy-btn:active {
+    transform: translateY(1px);
+  }
+  .copy-btn:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .copy-btn.done {
+    background: #1f7a4d;
+    color: #fff;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .copy-btn {
+      transition: none;
+    }
+  }
+  .hint {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .note {
+    margin-top: 40px;
+    padding: 16px 18px;
+    border-left: 3px solid var(--gold);
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+    border-radius: 0 8px 8px 0;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .note strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="eyebrow">Orchestra</p>
+  <h1>Je e-mailhandtekening instellen</h1>
+  <p class="lede">
+    Kopieer de handtekening hieronder, plak hem in Outlook en vervang naam,
+    functie en telefoonnummer door je eigen gegevens.
+  </p>
+
+  <ol class="steps">
+    <li>
+      Klik op <strong>&nbsp;Handtekening kopiëren&nbsp;</strong> hieronder.
+    </li>
+    <li>
+      In Outlook:
+      <strong>&nbsp;Bestand → Opties → E-mail → Handtekeningen</strong>
+      &nbsp;(of Instellingen → Handtekeningen).
+    </li>
+    <li>
+      Maak een nieuwe handtekening, plak (<strong
+        >&nbsp;Ctrl/Cmd + V&nbsp;</strong
+      >) en pas je naam, functie en telefoon aan.
+    </li>
+  </ol>
+
+  <p class="card-label">Voorbeeld</p>
+  <div class="preview">
+    <div id="signature">
+      <table
+        role="presentation"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          border-collapse: collapse;
+          font-family:
+            &quot;Averta&quot;, &quot;Helvetica Neue&quot;, Helvetica, Arial,
+            sans-serif;
+          color: #3d4455;
+        "
+      >
+        <tr>
+          <td
+            style="
+              font-style: italic;
+              padding: 0 0 12px 0;
+              font-family:
+                &quot;Averta&quot;, &quot;Helvetica Neue&quot;, Helvetica,
+                Arial, sans-serif;
+              font-size: 15px;
+              line-height: 1.3;
+              color: #0b2a48;
+            "
+          >
+            Met vriendelijke groet,
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0">
+            <table
+              role="presentation"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              style="border-collapse: collapse"
+            >
+              <tr>
+                <td
+                  valign="middle"
+                  style="padding: 0 20px 0 0; vertical-align: middle"
+                >
+                  <img
+                    src="data:image/png;base64,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"
+                    alt="Orchestra"
+                    width="195"
+                    height="30"
+                    style="
+                      display: block;
+                      border: 0;
+                      outline: none;
+                      text-decoration: none;
+                      height: auto;
+                    "
+                  />
+                </td>
+                <td
+                  valign="middle"
+                  style="
+                    padding: 1px 0 1px 18px;
+                    border-left: 2px solid #b8965a;
+                    vertical-align: middle;
+                  "
+                >
+                  <table
+                    role="presentation"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                    style="border-collapse: collapse"
+                  >
+                    <tr>
+                      <td
+                        style="
+                          padding: 0 0 3px 0;
+                          font-family:
+                            &quot;Averta&quot;, &quot;Helvetica Neue&quot;,
+                            Helvetica, Arial, sans-serif;
+                          font-size: 17px;
+                          line-height: 1.2;
+                          color: #0a1628;
+                          font-weight: 400;
+                          letter-spacing: -0.1px;
+                        "
+                      >
+                        Voornaam Achternaam
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        style="
+                          padding: 0 0 5px 0;
+                          font-family:
+                            &quot;Averta&quot;, &quot;Helvetica Neue&quot;,
+                            Helvetica, Arial, sans-serif;
+                          font-size: 10px;
+                          line-height: 1.4;
+                          letter-spacing: 2px;
+                          text-transform: uppercase;
+                          color: #b8965a;
+                          font-weight: 400;
+                        "
+                      >
+                        Functieomschrijving&nbsp;&nbsp;&middot;&nbsp;&nbsp;T
+                        <a
+                          href="tel:+310700000000"
+                          style="color: #b8965a; text-decoration: none"
+                          >+31 (0)70 000 00 00</a
+                        >
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        style="
+                          padding: 0;
+                          font-family:
+                            &quot;Averta&quot;, &quot;Helvetica Neue&quot;,
+                            Helvetica, Arial, sans-serif;
+                          font-size: 11px;
+                          line-height: 1.5;
+                          color: #3d4455;
+                        "
+                      >
+                        Mauritskade 25, 2514 HD&nbsp;Den
+                        Haag&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a
+                          href="https://orchestra-charityoffice.com"
+                          style="
+                            color: #0a1628;
+                            text-decoration: none;
+                            border-bottom: 1px solid #b8965a;
+                          "
+                          >Charity Office</a
+                        >&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a
+                          href="https://www.orchestra-privateoffice.com/"
+                          style="
+                            color: #0a1628;
+                            text-decoration: none;
+                            border-bottom: 1px solid #b8965a;
+                          "
+                          >Private Office</a
+                        >
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="copy-btn" id="copyBtn" type="button">
+      Handtekening kopiëren
+    </button>
+    <span class="hint" id="hint"
+      >Plakt met opmaak in Outlook, Gmail en Apple Mail.</span
+    >
+  </div>
+
+  <p class="note">
+    <strong>Werkt de opmaak niet?</strong> Selecteer dan het voorbeeld hierboven
+    handmatig met je muis (van boven naar onder) en kopieer met
+    Ctrl/Cmd&nbsp;+&nbsp;C. Vervang daarna je eigen naam, functie en
+    telefoonnummer.
+  </p>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("copyBtn");
+    var hint = document.getElementById("hint");
+    var sig = document.getElementById("signature");
+    var defaultLabel = btn.textContent;
+
+    function selectSignature() {
+      var range = document.createRange();
+      range.selectNodeContents(sig);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return range;
+    }
+
+    function done() {
+      btn.textContent = "Gekopieerd ✓";
+      btn.classList.add("done");
+      hint.textContent = "Ga naar Outlook en plak met Ctrl/Cmd + V.";
+      setTimeout(function () {
+        btn.textContent = defaultLabel;
+        btn.classList.remove("done");
+      }, 2600);
+    }
+
+    async function copy() {
+      var html = sig.innerHTML;
+      var text = sig.innerText;
+      // Preferred: rich clipboard write
+      if (
+        window.ClipboardItem &&
+        navigator.clipboard &&
+        navigator.clipboard.write
+      ) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "text/html": new Blob([html], { type: "text/html" }),
+              "text/plain": new Blob([text], { type: "text/plain" }),
+            }),
+          ]);
+          done();
+          return;
+        } catch (e) {
+          /* fall through */
+        }
+      }
+      // Fallback: select + execCommand (carries formatting)
+      try {
+        selectSignature();
+        if (document.execCommand("copy")) {
+          done();
+          return;
+        }
+      } catch (e) {
+        /* fall through */
+      }
+      // Last resort: leave it selected for manual copy
+      selectSignature();
+      hint.textContent =
+        "Selectie staat klaar — druk op Ctrl/Cmd + C om te kopiëren.";
+    }
+
+    btn.addEventListener("click", copy);
+  })();
+</script>
+</body>
+</html>
