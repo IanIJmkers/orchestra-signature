@@ -342,6 +342,17 @@
         autocomplete="tel"
       />
     </div>
+    <div class="field">
+      <label for="in-mobiel"
+        >Mobiel <span class="opt">(optioneel)</span></label
+      >
+      <input
+        id="in-mobiel"
+        type="tel"
+        placeholder="+31 (0)6 00 00 00 00"
+        autocomplete="tel"
+      />
+    </div>
   </div>
 
   <p class="card-label">Voorbeeld</p>
@@ -532,6 +543,7 @@
     var inAchternaam = document.getElementById("in-achternaam");
     var inFunctie = document.getElementById("in-functie");
     var inTelefoon = document.getElementById("in-telefoon");
+    var inMobiel = document.getElementById("in-mobiel");
 
     var nameCell = document.getElementById("sig-name");
     var fnRow = document.getElementById("sig-fn-tr");
@@ -556,28 +568,32 @@
       var achternaam = inAchternaam.value.trim();
       var functie = inFunctie.value.trim();
       var telefoon = inTelefoon.value.trim();
+      var mobiel = inMobiel.value.trim();
 
       var fullName = (voornaam + " " + achternaam).trim();
       nameCell.textContent = fullName || "Voornaam Achternaam";
 
-      var fnHtml = functie ? esc(functie) : "";
-      var telHtml = telefoon
-        ? 'T <a href="' +
-          telHref(telefoon) +
+      function phone(prefix, raw) {
+        return (
+          prefix +
+          ' <a href="' +
+          telHref(raw) +
           '" style="color:#b8965a; text-decoration:none;">' +
-          esc(telefoon) +
+          esc(raw) +
           "</a>"
-        : "";
-      var sep = "&nbsp;&nbsp;&middot;&nbsp;&nbsp;";
-
-      if (fnHtml && telHtml) {
-        fnCell.innerHTML = fnHtml + sep + telHtml;
-      } else {
-        fnCell.innerHTML = fnHtml || telHtml;
+        );
       }
 
-      // Hide (and drop from the copy) the whole line when both are empty.
-      if (fnHtml || telHtml) {
+      var parts = [];
+      if (functie) parts.push(esc(functie));
+      if (telefoon) parts.push(phone("T", telefoon));
+      if (mobiel) parts.push(phone("M", mobiel));
+
+      var sep = "&nbsp;&nbsp;&middot;&nbsp;&nbsp;";
+      fnCell.innerHTML = parts.join(sep);
+
+      // Hide (and drop from the copy) the whole line when nothing is filled.
+      if (parts.length) {
         fnRow.style.display = "";
         fnRow.removeAttribute("data-empty");
       } else {
@@ -660,7 +676,9 @@
         "Selectie staat klaar — druk op Ctrl/Cmd + C om te kopiëren.";
     }
 
-    [inVoornaam, inAchternaam, inFunctie, inTelefoon].forEach(function (el) {
+    [inVoornaam, inAchternaam, inFunctie, inTelefoon, inMobiel].forEach(function (
+      el,
+    ) {
       el.addEventListener("input", render);
     });
     btn.addEventListener("click", copy);
