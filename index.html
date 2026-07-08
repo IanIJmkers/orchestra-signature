@@ -239,6 +239,9 @@
     flex-direction: column;
     gap: 6px;
   }
+  .field--full {
+    grid-column: 1 / -1;
+  }
   .field label {
     font-size: 13px;
     font-weight: 600;
@@ -302,6 +305,17 @@
 
   <p class="card-label">Jouw gegevens</p>
   <div class="form">
+    <div class="field field--full">
+      <label for="in-afsluiting"
+        >Afsluiting <span class="opt">(optioneel)</span></label
+      >
+      <input
+        id="in-afsluiting"
+        type="text"
+        placeholder="Bijv. Met vriendelijke groet,"
+        value="Met vriendelijke groet,"
+      />
+    </div>
     <div class="field">
       <label for="in-voornaam">Voornaam <span class="req">*</span></label>
       <input
@@ -371,8 +385,9 @@
           color: #3d4455;
         "
       >
-        <tr>
+        <tr id="sig-groet-tr">
           <td
+            id="sig-groet"
             style="
               font-style: italic;
               padding: 0 0 12px 0;
@@ -544,7 +559,10 @@
     var inFunctie = document.getElementById("in-functie");
     var inTelefoon = document.getElementById("in-telefoon");
     var inMobiel = document.getElementById("in-mobiel");
+    var inAfsluiting = document.getElementById("in-afsluiting");
 
+    var groetRow = document.getElementById("sig-groet-tr");
+    var groetCell = document.getElementById("sig-groet");
     var nameCell = document.getElementById("sig-name");
     var fnRow = document.getElementById("sig-fn-tr");
     var fnCell = document.getElementById("sig-fn-cell");
@@ -569,6 +587,16 @@
       var functie = inFunctie.value.trim();
       var telefoon = inTelefoon.value.trim();
       var mobiel = inMobiel.value.trim();
+
+      var afsluiting = inAfsluiting.value.trim();
+      groetCell.textContent = afsluiting;
+      if (afsluiting) {
+        groetRow.style.display = "";
+        groetRow.removeAttribute("data-empty");
+      } else {
+        groetRow.style.display = "none";
+        groetRow.setAttribute("data-empty", "true");
+      }
 
       var fullName = (voornaam + " " + achternaam).trim();
       nameCell.textContent = fullName || "Voornaam Achternaam";
@@ -676,9 +704,14 @@
         "Selectie staat klaar — druk op Ctrl/Cmd + C om te kopiëren.";
     }
 
-    [inVoornaam, inAchternaam, inFunctie, inTelefoon, inMobiel].forEach(function (
-      el,
-    ) {
+    [
+      inAfsluiting,
+      inVoornaam,
+      inAchternaam,
+      inFunctie,
+      inTelefoon,
+      inMobiel,
+    ].forEach(function (el) {
       el.addEventListener("input", render);
     });
     btn.addEventListener("click", copy);
