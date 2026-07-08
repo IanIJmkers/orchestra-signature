@@ -254,7 +254,8 @@
     color: var(--muted);
     font-weight: 400;
   }
-  .field input {
+  .field input,
+  .field textarea {
     font: inherit;
     font-size: 15px;
     padding: 11px 13px;
@@ -266,10 +267,17 @@
       border-color 0.15s ease,
       box-shadow 0.15s ease;
   }
-  .field input::placeholder {
+  .field textarea {
+    resize: vertical;
+    min-height: 46px;
+    line-height: 1.45;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
     color: color-mix(in srgb, var(--muted) 65%, transparent);
   }
-  .field input:focus {
+  .field input:focus,
+  .field textarea:focus {
     outline: none;
     border-color: var(--navy);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 20%, transparent);
@@ -309,12 +317,11 @@
       <label for="in-afsluiting"
         >Afsluiting <span class="opt">(optioneel)</span></label
       >
-      <input
+      <textarea
         id="in-afsluiting"
-        type="text"
+        rows="2"
         placeholder="Bijv. Met vriendelijke groet,"
-        value="Met vriendelijke groet,"
-      />
+      >Met vriendelijke groet,</textarea>
     </div>
     <div class="field">
       <label for="in-voornaam">Voornaam <span class="req">*</span></label>
@@ -588,12 +595,13 @@
       var telefoon = inTelefoon.value.trim();
       var mobiel = inMobiel.value.trim();
 
-      var afsluiting = inAfsluiting.value.trim();
-      groetCell.textContent = afsluiting;
-      if (afsluiting) {
+      var afsluitingRaw = inAfsluiting.value;
+      if (afsluitingRaw.trim()) {
+        groetCell.innerHTML = esc(afsluitingRaw).replace(/\r\n|\r|\n/g, "<br>");
         groetRow.style.display = "";
         groetRow.removeAttribute("data-empty");
       } else {
+        groetCell.innerHTML = "";
         groetRow.style.display = "none";
         groetRow.setAttribute("data-empty", "true");
       }
